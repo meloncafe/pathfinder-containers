@@ -27,7 +27,7 @@ services:
       driver: none
     restart: always
   pf-socket:
-    image: ghcr.io/goryn-clade/pf-websocket:latest
+    image: meloncafe/pf-websocket:latest
     command: ["--tcpHost", "0.0.0.0"]
     hostname: socket
     networks:
@@ -37,7 +37,7 @@ services:
     restart: always
   pf:
     hostname: "pathfinder"
-    image: ghcr.io/goryn-clade/pathfinder:latest
+    image: meloncafe/pathfinder:latest
     env_file:
     - .env
     labels:
