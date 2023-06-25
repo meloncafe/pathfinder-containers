@@ -1,6 +1,6 @@
 FROM meloncafe/alpine-nginx-php:7-latest
 
-RUN apk update && apk add --no-cache composer busybox-suid sudo php7-redis php7-pdo php7-pdo_mysql \
+RUN apk update && apk add --no-cache composer busybox-suid sudo bash php7-redis php7-pdo php7-pdo_mysql \
     php7-fileinfo php7-event shadow gettext bash apache2-utils logrotate ca-certificates
 
 # fix expired DST Cert
@@ -18,7 +18,7 @@ RUN mkdir -p /etc/nginx/sites_enabled/
 COPY static/nginx/site.conf  /etc/nginx/templateSite.conf
 
 # Configure PHP-FPM
-COPY static/php/fpm-pool.conf /etc/php7/php-fpm.d/zzz_custom.conf
+COPY static/php/fpm-pool.conf /etc/php7/php-fpm.d/www.conf
 
 COPY static/php/php.ini /etc/zzz_custom.ini
 # configure cron
@@ -36,11 +36,12 @@ RUN composer install
 
 WORKDIR /var/www/html
 
-RUN chmod 0766 pathfinder/logs pathfinder/tmp/ && rm index.php && touch /etc/nginx/.setup_pass &&  chmod +x /entrypoint.sh
+RUN chmod 0766 pathfinder/logs pathfinder/tmp/ && touch /etc/nginx/.setup_pass &&  chmod +x /entrypoint.sh
 COPY static/pathfinder/routes.ini /var/www/html/pathfinder/app/
 COPY static/pathfinder/environment.ini /var/www/html/pathfinder/app/templateEnvironment.ini
 
-WORKDIR /var/www/html
+RUN chown -R nobody:nobody /var/www/html/pathfinder
+
 EXPOSE 80
 
 ENTRYPOINT ["/entrypoint.sh"]
